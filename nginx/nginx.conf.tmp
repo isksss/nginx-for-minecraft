@@ -1,0 +1,38 @@
+
+#user  nobody;
+worker_processes auto;
+
+# error_log  logs/error.log;
+# error_log  logs/error.log  notice;
+# error_log  logs/error.log  info;
+
+pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+stream {
+    resolver 8.8.8.8 valid=60s ipv6=off;
+    # error_log /var/log/nginx/stream.log info;
+    proxy_protocol on;
+    upstream java {
+        server <domain>:<port>;
+    }
+
+    upstream bedrock {
+        server <domain>:<port>;
+    }
+    server {
+        listen <port>;
+        proxy_pass java;
+        proxy_timeout 60s;
+    }
+    server {
+        listen <port> udp;
+        proxy_pass bedrock;
+        proxy_timeout 60s;
+        
+    }
+}
