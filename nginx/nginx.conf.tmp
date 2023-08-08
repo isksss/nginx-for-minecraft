@@ -15,24 +15,31 @@ events {
 
 stream {
     resolver 8.8.8.8 valid=60s ipv6=off;
-    # error_log /var/log/nginx/stream.log info;
     proxy_protocol on;
+
+    ## 下記変数を書き換える #####
+    set $domain <domain>
+    set $jeport <java port>
+    set $beport <bedrock port>
+    ##### ##### ##### ##### #####
+
     upstream java {
-        server <domain>:<port>;
+        server $domain:$jeport;
     }
 
     upstream bedrock {
-        server <domain>:<port>;
+        server $domain:$beport;
     }
+
     server {
-        listen <port>;
+        listen $jeport;
         proxy_pass java;
         proxy_timeout 60s;
     }
+
     server {
-        listen <port> udp;
+        listen $beport udp;
         proxy_pass bedrock;
         proxy_timeout 60s;
-        
     }
 }
